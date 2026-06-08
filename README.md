@@ -1,15 +1,10 @@
-# Simple GUI Calculator
+# Login Authentication App
 
-A simple calculator built with Python Tkinter.
+Simple responsive login page deployable on Netlify.
 
-## Features
-- Addition (+)
-- Subtraction (-)
-- Multiplication (*)
-- Division (/)
-- Exponent (^)
-- Modulus (%)
-- Clear (C)
+Demo credentials:
+- Username: admin
+- Password: password123
 
-## Run
-python calculator.py
+## Deploy
+Drag-and-drop the project folder or zip contents to Netlify.
