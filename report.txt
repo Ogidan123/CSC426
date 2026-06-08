@@ -1,0 +1,15 @@
+SIMPLE GUI CALCULATOR REPORT
+
+Objective:
+Develop a user-friendly GUI calculator using Python Tkinter.
+
+Operations:
++, -, *, /, ^, %, C
+
+Testing:
+5+3=8
+10-4=6
+6*7=42
+20/5=4
+2^3=8
+10%3=1
