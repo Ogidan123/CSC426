@@ -3,22 +3,378 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login Authentication App</title>
-<link rel="stylesheet" href="style.css">
+<title>IRO — Issues Reporting Outlet</title>
+<style>
+  :root{
+    --navy:#1F3864;
+    --navy-dark:#122341;
+    --teal:#0F6E56;
+    --amber:#B5750E;
+    --bg:#F4F6F8;
+    --card:#FFFFFF;
+    --border:#DDE3EA;
+    --text:#1C2530;
+    --muted:#5C6773;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+  }
+  header{
+    background:var(--navy);
+    color:#fff;
+    padding:22px 24px;
+  }
+  header h1{margin:0;font-size:22px;}
+  header p{margin:4px 0 0;font-size:13px;color:#C9D6E8;}
+  nav{
+    display:flex;
+    background:var(--navy-dark);
+  }
+  nav button{
+    flex:1;
+    padding:12px;
+    background:none;
+    border:none;
+    color:#C9D6E8;
+    font-size:14px;
+    cursor:pointer;
+    border-bottom:3px solid transparent;
+  }
+  nav button.active{
+    color:#fff;
+    border-bottom:3px solid var(--amber);
+    font-weight:600;
+  }
+  main{
+    max-width:760px;
+    margin:0 auto;
+    padding:24px 16px 60px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:20px;
+    margin-bottom:18px;
+  }
+  .card h2{margin-top:0;font-size:17px;color:var(--navy);}
+  label{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    margin:14px 0 6px;
+    color:var(--text);
+  }
+  input, select, textarea{
+    width:100%;
+    padding:10px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    font-size:14px;
+    font-family:inherit;
+    background:#fff;
+  }
+  textarea{resize:vertical;min-height:80px;}
+  .row{display:flex;gap:12px;}
+  .row > div{flex:1;}
+  button.submit{
+    margin-top:18px;
+    background:var(--teal);
+    color:#fff;
+    border:none;
+    padding:12px 20px;
+    border-radius:6px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  button.submit:hover{background:#0b543f;}
+  .msg{
+    display:none;
+    margin-top:12px;
+    padding:10px 12px;
+    border-radius:6px;
+    background:#E6F1FB;
+    color:#0C447C;
+    font-size:13px;
+  }
+  .filters{
+    display:flex;
+    gap:10px;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+  }
+  .filters select{width:auto;flex:1;min-width:140px;}
+  .issue{
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px;
+    margin-bottom:12px;
+  }
+  .issue-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+  }
+  .issue-title{font-weight:600;font-size:15px;color:var(--text);}
+  .issue-meta{font-size:12px;color:var(--muted);margin-top:3px;}
+  .badge{
+    font-size:11px;
+    font-weight:700;
+    padding:4px 9px;
+    border-radius:20px;
+    white-space:nowrap;
+  }
+  .badge.pending{background:#FAEEDA;color:#854F0B;}
+  .badge.review{background:#E6F1FB;color:#0C447C;}
+  .badge.resolved{background:#EAF3DE;color:#27500A;}
+  .issue-desc{font-size:13px;color:var(--text);margin-top:8px;line-height:1.5;}
+  .empty{
+    text-align:center;
+    color:var(--muted);
+    padding:30px 10px;
+    font-size:14px;
+  }
+  select.status-select{
+    margin-top:10px;
+    max-width:200px;
+  }
+  .tracking{
+    font-family:monospace;
+    background:#F1EFE8;
+    padding:1px 6px;
+    border-radius:4px;
+  }
+  footer{
+    text-align:center;
+    font-size:12px;
+    color:var(--muted);
+    padding:20px;
+  }
+</style>
 </head>
 <body>
-<div class="container">
-  <form id="loginForm" class="card">
-    <h2>Login</h2>
-    <input type="text" id="username" placeholder="Username">
-    <input type="password" id="password" placeholder="Password">
-    <div class="buttons">
-      <button type="submit">Login</button>
-      <button type="reset">Reset</button>
+
+<header>
+  <h1>IRO — Issues Reporting Outlet</h1>
+  <p>For AAUA students &amp; indigenes of Akungba, Iwaro, Etioro, Ayegunle and environs</p>
+</header>
+
+<nav>
+  <button id="tabReportBtn" class="active" onclick="showTab('report')">Report an issue</button>
+  <button id="tabMineBtn" onclick="showTab('mine')">Track my reports</button>
+  <button id="tabAdminBtn" onclick="showTab('admin')">Admin dashboard</button>
+</nav>
+
+<main>
+
+  <!-- REPORT TAB -->
+  <section id="tabReport" class="card">
+    <h2>Submit a new issue report</h2>
+    <form id="reportForm">
+      <label for="reporterType">I am a</label>
+      <select id="reporterType" required>
+        <option value="">Select...</option>
+        <option value="Student">AAUA Student</option>
+        <option value="Indigene">Indigene</option>
+      </select>
+
+      <label for="community">Community / location</label>
+      <select id="community" required>
+        <option value="">Select...</option>
+        <option>AAUA Campus (Akungba)</option>
+        <option>Akungba</option>
+        <option>Iwaro</option>
+        <option>Etioro</option>
+        <option>Ayegunle</option>
+        <option>Other</option>
+      </select>
+
+      <div class="row">
+        <div>
+          <label for="category">Issue category</label>
+          <select id="category" required>
+            <option value="">Select...</option>
+            <option>Security</option>
+            <option>Infrastructure</option>
+            <option>Welfare</option>
+            <option>Academic</option>
+            <option>Environment</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div>
+          <label for="title">Short title</label>
+          <input type="text" id="title" placeholder="e.g. Broken streetlight" required>
+        </div>
+      </div>
+
+      <label for="description">Describe the issue</label>
+      <textarea id="description" placeholder="Give as much detail as possible..." required></textarea>
+
+      <button type="submit" class="submit">Submit report</button>
+      <div class="msg" id="successMsg"></div>
+    </form>
+  </section>
+
+  <!-- MY REPORTS TAB -->
+  <section id="tabMine" class="card" style="display:none;">
+    <h2>Track my reports</h2>
+    <p style="font-size:13px;color:var(--muted);margin-top:-6px;">Reports submitted in this session appear below.</p>
+    <div id="mineList"></div>
+  </section>
+
+  <!-- ADMIN TAB -->
+  <section id="tabAdmin" class="card" style="display:none;">
+    <h2>Admin dashboard — all reports</h2>
+    <div class="filters">
+      <select id="filterCategory" onchange="renderAdmin()">
+        <option value="">All categories</option>
+        <option>Security</option>
+        <option>Infrastructure</option>
+        <option>Welfare</option>
+        <option>Academic</option>
+        <option>Environment</option>
+        <option>Other</option>
+      </select>
+      <select id="filterStatus" onchange="renderAdmin()">
+        <option value="">All statuses</option>
+        <option>Pending</option>
+        <option>In Review</option>
+        <option>Resolved</option>
+      </select>
     </div>
-    <p id="message"></p>
-  </form>
-</div>
-<script src="script.js"></script>
+    <div id="adminList"></div>
+    <div id="stats" style="margin-top:16px;font-size:13px;color:var(--muted);"></div>
+  </section>
+
+</main>
+
+<footer>IRO — CSC426 Weekend Dev Task | Demo build (in-memory data, resets on page reload)</footer>
+
+<script>
+  // In-memory data store (no backend for this mini-interface demo)
+  let issues = [];
+  let counter = 1;
+
+  function genTrackingId(){
+    return 'IRO-' + String(counter++).padStart(4, '0');
+  }
+
+  function showTab(tab){
+    document.getElementById('tabReport').style.display = tab === 'report' ? 'block' : 'none';
+    document.getElementById('tabMine').style.display = tab === 'mine' ? 'block' : 'none';
+    document.getElementById('tabAdmin').style.display = tab === 'admin' ? 'block' : 'none';
+    document.getElementById('tabReportBtn').classList.toggle('active', tab === 'report');
+    document.getElementById('tabMineBtn').classList.toggle('active', tab === 'mine');
+    document.getElementById('tabAdminBtn').classList.toggle('active', tab === 'admin');
+    if(tab === 'mine') renderMine();
+    if(tab === 'admin') renderAdmin();
+  }
+
+  document.getElementById('reportForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const issue = {
+      id: genTrackingId(),
+      reporterType: document.getElementById('reporterType').value,
+      community: document.getElementById('community').value,
+      category: document.getElementById('category').value,
+      title: document.getElementById('title').value,
+      description: document.getElementById('description').value,
+      status: 'Pending',
+      date: new Date().toLocaleString()
+    };
+    issues.unshift(issue);
+    this.reset();
+    const msg = document.getElementById('successMsg');
+    msg.style.display = 'block';
+    msg.textContent = 'Report submitted. Your tracking ID is ' + issue.id + '. Use "Track my reports" to follow its status.';
+    setTimeout(()=>{ msg.style.display='none'; }, 6000);
+  });
+
+  function statusClass(status){
+    if(status === 'Resolved') return 'resolved';
+    if(status === 'In Review') return 'review';
+    return 'pending';
+  }
+
+  function renderMine(){
+    const list = document.getElementById('mineList');
+    if(issues.length === 0){
+      list.innerHTML = '<div class="empty">No reports submitted yet in this session.</div>';
+      return;
+    }
+    list.innerHTML = issues.map(i => `
+      <div class="issue">
+        <div class="issue-top">
+          <div>
+            <div class="issue-title">${escapeHtml(i.title)}</div>
+            <div class="issue-meta">
+              <span class="tracking">${i.id}</span> · ${escapeHtml(i.category)} · ${escapeHtml(i.community)} · ${i.date}
+            </div>
+          </div>
+          <span class="badge ${statusClass(i.status)}">${i.status}</span>
+        </div>
+        <div class="issue-desc">${escapeHtml(i.description)}</div>
+      </div>
+    `).join('');
+  }
+
+  function renderAdmin(){
+    const cat = document.getElementById('filterCategory').value;
+    const stat = document.getElementById('filterStatus').value;
+    const list = document.getElementById('adminList');
+    const filtered = issues.filter(i =>
+      (!cat || i.category === cat) && (!stat || i.status === stat)
+    );
+    if(filtered.length === 0){
+      list.innerHTML = '<div class="empty">No matching reports.</div>';
+    } else {
+      list.innerHTML = filtered.map(i => `
+        <div class="issue">
+          <div class="issue-top">
+            <div>
+              <div class="issue-title">${escapeHtml(i.title)}</div>
+              <div class="issue-meta">
+                <span class="tracking">${i.id}</span> · ${escapeHtml(i.reporterType)} · ${escapeHtml(i.category)} · ${escapeHtml(i.community)} · ${i.date}
+              </div>
+            </div>
+            <span class="badge ${statusClass(i.status)}">${i.status}</span>
+          </div>
+          <div class="issue-desc">${escapeHtml(i.description)}</div>
+          <select class="status-select" onchange="updateStatus('${i.id}', this.value)">
+            <option ${i.status==='Pending'?'selected':''}>Pending</option>
+            <option ${i.status==='In Review'?'selected':''}>In Review</option>
+            <option ${i.status==='Resolved'?'selected':''}>Resolved</option>
+          </select>
+        </div>
+      `).join('');
+    }
+    const total = issues.length;
+    const resolved = issues.filter(i=>i.status==='Resolved').length;
+    const pending = issues.filter(i=>i.status==='Pending').length;
+    document.getElementById('stats').textContent =
+      `Total reports: ${total}  |  Pending: ${pending}  |  Resolved: ${resolved}`;
+  }
+
+  function updateStatus(id, newStatus){
+    const issue = issues.find(i => i.id === id);
+    if(issue){ issue.status = newStatus; }
+    renderAdmin();
+    renderMine();
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+</script>
+
 </body>
 </html>
